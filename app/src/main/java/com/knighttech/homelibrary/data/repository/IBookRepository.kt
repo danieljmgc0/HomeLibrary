@@ -1,6 +1,6 @@
 package com.knighttech.homelibrary.data.repository
 
-import com.knighttech.homelibrary.data.model.Book
+import com.knighttech.homelibrary.domain.model.Book
 
 interface IBookRepository {
     suspend fun getBookByIsbn(isbn: String): Book?
