@@ -2,4 +2,17 @@
 <resources>
 
     <style name="Theme.HomeLibrary" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.MyApp.Splash" parent="Theme.SplashScreen">
+        <!-- Background color -->
+        <item name="windowSplashScreenBackground">#FFFFFF</item>
+        <item name="windowSplashScreenIconBackgroundColor">@null</item>
+        <!-- Your app logo -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/logo</item>
+        <!-- Animation duration -->
+        <item name="windowSplashScreenAnimationDuration">2000</item>
+        <!-- Optional: remove status bar until transition -->
+        <item name="postSplashScreenTheme">@style/Theme.HomeLibrary</item>
+    </style>
+
 </resources>
