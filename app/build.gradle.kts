@@ -1,8 +1,15 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.secrets.gradle.plugin) apply false
 }
+
+var secretsProperties = Properties()
+secretsProperties.load(FileInputStream(rootProject.file("local.properties")))
 
 android {
     namespace = "com.knighttech.homelibrary"
@@ -16,6 +23,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "BOOKS_APIKEY", secretsProperties.getProperty("BOOKS_APIKEY"))
     }
 
     buildTypes {
@@ -36,6 +45,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -70,4 +80,9 @@ dependencies {
     implementation("androidx.camera:camera-view:1.2.3")
     implementation("com.google.mlkit:barcode-scanning:17.0.2")
     implementation("com.google.accompanist:accompanist-permissions:0.31.5-beta")
+
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 }
+
+

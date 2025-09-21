@@ -3,6 +3,7 @@ package com.knighttech.homelibrary
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -28,46 +29,62 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
+import com.knighttech.homelibrary.domain.usecases.GetBookByIsbnUsecase
 import com.knighttech.homelibrary.ui.theme.White
+import kotlinx.coroutines.launch
 
 class AddBookActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            HomeLibraryTheme {
-                setContent{
-                    SearchScreen(
-                        onSearchClick = { query ->
-                            // Aquí pones lo que quieras hacer con el texto
-                            println("Buscar: $query")
-                        },
-                        onScanClick = {
-                            // Aquí pondrías lógica para abrir cámara / escanear QR
-                            //println("Escanear código QR")
-                            startActivity(Intent(this, ScanScreenActivity::class.java))
-                        }
-                    )
+            var query by remember { mutableStateOf("") }
+
+            // Launcher para recibir el resultado del ScanScreenActivity
+            val launcher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.StartActivityForResult()
+            ) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    val scannedIsbn = result.data?.getStringExtra("scanned_isbn")
+                    if (!scannedIsbn.isNullOrEmpty()) {
+                        query = scannedIsbn // lo escribimos en el TextField
+                    }
                 }
             }
+
+            SearchScreen(
+                query = query,
+                onQueryChange = { query = it },
+                onSearchClick = { isbn ->
+                    lifecycleScope.launch {
+                        println("Buscar: $isbn")
+                        val ser = GetBookByIsbnUsecase()
+                        val info = ser.getBookByIsbn(isbn)
+                        Log.d("BOOK ES: ", info.toString())
+                    }
+                },
+                onScanClick = {
+                    launcher.launch(Intent(this, ScanScreenActivity::class.java))
+                }
+            )
         }
     }
 }
 
 @Composable
 fun SearchScreen(
+    query: String,
+    onQueryChange: (String) -> Unit,
     onSearchClick: (String) -> Unit,
     onScanClick: () -> Unit
 ) {
-    var query by remember { mutableStateOf("") }
-
     Box(modifier = Modifier.fillMaxSize()) {
-        // Imagen de fondo
         Image(
             painter = painterResource(id = R.drawable.fondo_imagen),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop // ajusta para cubrir toda la pantalla
+            contentScale = ContentScale.Crop
         )
         Column(
             modifier = Modifier
@@ -76,20 +93,19 @@ fun SearchScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(50.dp))
-            // Input de texto
+
             TextField(
                 value = query,
-                onValueChange = { query = it },
+                onValueChange = { onQueryChange(it) },
                 label = { Text("Buscar libro") },
-                modifier = Modifier.fillMaxWidth()
-                .background(color = White),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(color = White),
             )
 
-            //Spacer(modifier = Modifier.height(16.dp))
-
-            // Fila con los dos botones
             Row(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(vertical = 10.dp),
                 horizontalArrangement = Arrangement.Center
             ) {

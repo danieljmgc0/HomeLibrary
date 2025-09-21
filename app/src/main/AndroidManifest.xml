@@ -20,6 +20,8 @@
             android:name="com.google.firebase.ml.vision.DEPENDENCIES"
             android:value="label" />
 
+
+
         <activity
             android:name=".BookListActivity"
             android:exported="false"

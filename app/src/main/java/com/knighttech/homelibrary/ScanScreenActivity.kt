@@ -117,7 +117,6 @@ fun ScanScreen(onResult: (String) -> Unit) {
                                             if (code != detected) {
                                                 detected = code
                                                 mycode = code
-                                                Log.e("SCANNER", detected+ "and" + code)
                                                 onResult(code)
                                             }
                                         }
