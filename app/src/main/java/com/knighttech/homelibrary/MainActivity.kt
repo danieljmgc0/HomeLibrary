@@ -15,6 +15,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -37,11 +39,11 @@ class MainActivity : ComponentActivity() {
             MenuScreen(
                 onAddBookClick = {
                     // Aquí lanzas tu actividad para añadir libro
-                    // startActivity(Intent(this, AddBookActivity::class.java))
+                    startActivity(Intent(this, AddBookActivity::class.java))
                 },
                 onViewListClick = {
                     // Aquí lanzas tu actividad para ver lista
-                    // startActivity(Intent(this, BookListActivity::class.java))
+                    startActivity(Intent(this, BookListActivity::class.java))
                 }
             )
         }
@@ -52,7 +54,9 @@ class MainActivity : ComponentActivity() {
 fun MenuScreen(
     onAddBookClick: () -> Unit,
     onViewListClick: () -> Unit
+
 ) {
+
     Box(modifier = Modifier.fillMaxSize()) {
         // Imagen de fondo
         Image(
@@ -80,7 +84,9 @@ fun MenuScreen(
                 onClick = onAddBookClick,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp)
+                    .padding(vertical = 10.dp)
+                    .size(width = 60.dp, height = 60.dp),
+                shape = RoundedCornerShape(10.dp)
             ) {
                 Text("Añadir nuevo libro")
             }
@@ -89,7 +95,9 @@ fun MenuScreen(
                 onClick = onViewListClick,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp)
+                    .padding(vertical = 10.dp)
+                    .size(width = 60.dp, height = 60.dp),
+                shape = RoundedCornerShape(10.dp)
             ) {
                 Text("Ver biblioteca")
             }

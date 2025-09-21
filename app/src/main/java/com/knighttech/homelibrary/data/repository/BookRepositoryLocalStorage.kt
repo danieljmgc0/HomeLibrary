@@ -8,18 +8,18 @@ val b : Book = Book("1234", "Titulo", "autor");
 val b2 : Book = Book("5678", "Titulo2", "autor2");
 
 class BookRepositoryLocalStorage() : IBookRepository {
-    override suspend fun getBookByIsbn(isbn: String): Book? {
+    override fun getBookByIsbn(isbn: String): Book? {
         //return remoteDataSource.getBookByIsbn(isbn)
         Log.d("MYLOG", b.isbn)
         return b;
     }
 
-    override suspend fun saveBook(book: Book) {
+    override fun saveBook(book: Book) {
         //localDataSource.saveBook(book)
         Log.d("MYLOG", b.isbn)
     }
 
-    override suspend fun getAllBooks(): List<Book> {
+    override fun getAllBooks(): List<Book> {
         //return localDataSource.getAllBooks()
         val books = listOf(b, b2)
         Log.d("MYLOG", b.isbn)

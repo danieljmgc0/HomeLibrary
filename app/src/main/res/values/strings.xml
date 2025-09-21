@@ -2,4 +2,9 @@
     <string name="app_name">HomeLibrary</string>
     <string name="title_activity_menu">MenuActivity</string>
     <string name="title_activity_splash">SplashActivity</string>
+    <string name="title_activity_add_book">AddBookActivity</string>
+    <string name="title_activity_get_all_books">GetAllBooks</string>
+    <string name="title_activity_get_books">GetBooksActivity</string>
+    <string name="title_activity_scan_screen">ScanScreenActivity</string>
+    <string name="title_activity_book_list">BookListActivity</string>
 </resources>
