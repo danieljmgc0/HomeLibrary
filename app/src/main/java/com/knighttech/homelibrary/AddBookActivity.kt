@@ -30,8 +30,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
+import com.knighttech.homelibrary.domain.model.Book
 import com.knighttech.homelibrary.domain.usecases.GetBookByIsbnUsecase
+import com.knighttech.homelibrary.ui.theme.AddBookFormActivity
 import com.knighttech.homelibrary.ui.theme.White
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class AddBookActivity : ComponentActivity() {
@@ -52,22 +56,52 @@ class AddBookActivity : ComponentActivity() {
                     }
                 }
             }
+            var showPreview by remember { mutableStateOf(false) }
+            var theBook by remember { mutableStateOf<Book?>(null) }
 
             SearchScreen(
                 query = query,
                 onQueryChange = { query = it },
                 onSearchClick = { isbn ->
-                    lifecycleScope.launch {
+                    GlobalScope.launch(Dispatchers.IO) {
                         println("Buscar: $isbn")
                         val ser = GetBookByIsbnUsecase()
-                        val info = ser.getBookByIsbn(isbn)
-                        Log.d("BOOK ES: ", info.toString())
+                        ser.getBookByIsbn(isbn) { book ->
+                            theBook = book
+                            showPreview = true
+                        }
+
+
                     }
                 },
                 onScanClick = {
                     launcher.launch(Intent(this, ScanScreenActivity::class.java))
                 }
             )
+
+            if (showPreview) {
+                if (theBook != null) {
+                    BookPreviewDialog(
+                        book = theBook!!,
+                        onDismiss = { showPreview = false },
+                        onConfirm = {
+                            // Aquí guardas en Room
+                            showPreview = false
+                        }
+                    )
+                } else {
+                    AlertaLibroNoEncontrado(
+                        onConfirm = {
+                            launcher.launch(Intent(this, AddBookFormActivity::class.java))
+                        },
+                        onDismiss = {
+                            this.onDestroy()
+                        },
+                        theBook?.isbn_13 ?: "NOISBN"
+
+                    )
+                }
+            }
         }
     }
 }
@@ -135,36 +169,50 @@ fun SearchScreen(
     }
 }
 
-/*
-@Preview(showBackground = true)
+
 @Composable
-fun ScanScreenPreview() {
-    HomeLibraryTheme {
-        HomeLibraryTheme {
-            var query by remember { mutableStateOf("") }
-
-            // Launcher para recibir datos del ScanScreenActivity
-            val launcher = rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.StartActivityForResult()
-            ) { result ->
-                if (result.resultCode == RESULT_OK) {
-                    val scannedIsbn = result.data?.getStringExtra("scanned_isbn")
-                    if (!scannedIsbn.isNullOrEmpty()) {
-                        query = scannedIsbn // asigna directamente al TextField
-                    }
-                }
+fun BookPreviewDialog(
+    book: Book,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = { onDismiss() },
+        confirmButton = {
+            TextButton(onClick = onConfirm) { Text("Guardar") }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Cancelar") }
+        },
+        title = { Text("Preview del libro") },
+        text = {
+            Column {
+                Text("ISBN: ${book.isbn_13}")
+                Spacer(Modifier.height(4.dp))
+                Text("Título: ${book.title}")
+                Spacer(Modifier.height(4.dp))
+                Text("Autor: ${book.author1}")
             }
-
-            SearchScreen(
-                query = query,
-                onQueryChange = { query = it },
-                onSearchClick = { isbn ->
-                    println("Buscar: $isbn")
-                },
-                onScanClick = {
-                    launcher.launch(Intent(this, ScanScreenActivity::class.java))
-                }
-            )
         }
-    }
-}*/
+    )
+}
+
+@Composable
+fun AlertaLibroNoEncontrado(onConfirm: () -> Unit, onDismiss: () -> Unit, isbn: String) {
+    AlertDialog(
+        onDismissRequest = { onDismiss() },
+        confirmButton = {
+            TextButton(onClick = onConfirm) { Text("Sí") }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("No") }
+        },
+        title = { Text("Error al buscar libro") },
+        text = {
+            Column {
+                Text("El libro con ISBN no ha sido encontrado. ¿Desea introducir los datos manualmente?")
+            }
+        }
+    )
+}
+

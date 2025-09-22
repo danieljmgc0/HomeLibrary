@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
     <uses-permission android:name="android.permission.CAMERA" />
 
     <uses-feature android:name="android.hardware.camera" />
@@ -15,12 +16,15 @@
         android:roundIcon="@drawable/fondo_imagen"
         android:supportsRtl="true"
         android:theme="@style/Theme.HomeLibrary">
+        <activity
+            android:name=".ui.theme.AddBookFormActivity"
+            android:exported="false"
+            android:label="@string/title_activity_add_book_form"
+            android:theme="@style/Theme.HomeLibrary" />
 
         <meta-data
             android:name="com.google.firebase.ml.vision.DEPENDENCIES"
             android:value="label" />
-
-
 
         <activity
             android:name=".BookListActivity"
@@ -37,7 +41,6 @@
             android:exported="false"
             android:label="@string/title_activity_add_book"
             android:theme="@style/Theme.HomeLibrary" />
-
         <activity
             android:name=".MainActivity"
             android:exported="true"

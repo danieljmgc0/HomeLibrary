@@ -15,6 +15,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -23,12 +25,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.knighttech.homelibrary.ui.theme.HomeLibraryTheme
+import com.knighttech.homelibrary.ui.theme.ui.theme.Purple40
+import com.knighttech.homelibrary.ui.theme.ui.theme.Purple80
 import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
@@ -71,14 +77,19 @@ fun MenuScreen(
                 .fillMaxSize()
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            //verticalArrangement = Arrangement.Center
         ) {
+            Spacer(modifier = Modifier.height(30.dp))
             Text(
                 text = "HomeLibrary",
-                fontSize = 28.sp,
+                fontFamily = FontFamily(Font(R.font.handwritten)),
+                fontSize = 50.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 32.dp)
+                modifier = Modifier.padding(bottom = 32.dp),
+                color = Purple40
             )
+
+            Spacer(modifier = Modifier.height(170.dp))
 
             Button(
                 onClick = onAddBookClick,

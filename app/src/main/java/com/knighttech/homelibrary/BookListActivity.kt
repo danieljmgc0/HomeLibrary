@@ -89,11 +89,11 @@ fun BookListScreen() {
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Column(Modifier.padding(12.dp)) {
-                            Text("ISBN: ${book.isbn}")
+                            Text("ISBN: ${book.isbn_13}")
                             Spacer(Modifier.height(4.dp))
                             Text("Título: ${book.title}")
                             Spacer(Modifier.height(4.dp))
-                            Text("Autor: ${book.author}")
+                            Text("Autor: ${book.author1}")
                         }
                     }
                 }
