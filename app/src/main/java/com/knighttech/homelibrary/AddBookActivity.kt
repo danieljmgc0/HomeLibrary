@@ -21,16 +21,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.knighttech.homelibrary.domain.model.Book
 import com.knighttech.homelibrary.domain.usecases.GetBookFromApi
 import com.knighttech.homelibrary.domain.usecases.ManageBookDatabase
+import com.knighttech.homelibrary.ui.theme.Purple40
 import com.knighttech.homelibrary.ui.theme.White
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -74,9 +80,11 @@ class AddBookActivity : ComponentActivity() {
                             }
                             showDialog = true
                             globalIsbn = isbn
+                            query = ""
                         }
                     } else{
                         isError = true
+                        query = ""
                     }
                 },
                 onScanClick = {
@@ -136,62 +144,100 @@ fun SearchScreen(
     onScanClick: () -> Unit
 ) {
     var isError by remember { mutableStateOf(false) }
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box {
         Image(
             painter = painterResource(id = R.drawable.fondo_imagen),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
+
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            //verticalArrangement = Arrangement.Center
         ) {
-            Spacer(modifier = Modifier.height(50.dp))
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = "Home",
+                fontFamily = FontFamily(Font(R.font.handwritten)),
+                fontSize = 44.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .padding(top = 5.dp, start = 10.dp)
+                    .align(Alignment.Start),
+                color = Purple40
+            )
+
+            Text(
+                text = "Library",
+                fontFamily = FontFamily(Font(R.font.handwritten)),
+                fontSize = 44.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = 10.dp).align(Alignment.Start),
+                color = Purple40
+            )
+            // Barra de búsqueda (un poco encima del centro → con Spacer negativo)
+            Spacer(modifier = Modifier.height((146).dp))
 
             TextField(
                 value = query,
-                onValueChange = {onQueryChange(it)},
+                onValueChange = { onQueryChange(it) },
                 label = { Text("Buscar libro") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(color = White),
+                shape = RoundedCornerShape(10.dp),
+                singleLine = true
             )
 
-            Row(
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Botones debajo
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 10.dp),
-                horizontalArrangement = Arrangement.Center
+                //horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 Button(
                     onClick = { onSearchClick(query) },
                     modifier = Modifier
-                        .weight(1f)
-                        .height(60.dp),
+                        .fillMaxWidth()
+                        .height(70.dp)
+                        .padding(vertical = 7.dp),
                     shape = RoundedCornerShape(10.dp)
                 ) {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Buscar",
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
                     Text("Buscar")
                 }
-
-                Spacer(modifier = Modifier.width(10.dp))
 
                 Button(
                     onClick = onScanClick,
                     modifier = Modifier
-                        .weight(1f)
-                        .height(60.dp),
+                        .fillMaxWidth()
+                        .height(70.dp)
+                        .padding(vertical = 7.dp),
                     shape = RoundedCornerShape(10.dp)
                 ) {
-                    Text("Escanear Código")
+                    Icon(
+                        painter = painterResource(id = R.drawable.barcode_icon),
+                        contentDescription = "Escanear",
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                    Text("Escanear")
                 }
             }
         }
     }
 }
-
 
 @Composable
 fun BookPreviewDialog(
@@ -239,3 +285,19 @@ fun AlertaLibroNoEncontrado(onConfirm: () -> Unit, onDismiss: () -> Unit, isbn: 
     )
 }
 
+@Composable
+@Preview
+fun PreviewAddBook() {
+    SearchScreen(
+        query = "a",
+        onQueryChange = {
+
+        },
+        onSearchClick ={
+
+        },
+        onScanClick = {
+
+        }
+    )
+}

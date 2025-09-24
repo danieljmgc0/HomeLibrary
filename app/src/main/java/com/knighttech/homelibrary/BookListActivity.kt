@@ -6,15 +6,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import com.knighttech.homelibrary.ui.theme.HomeLibraryTheme
 import androidx.compose.ui.Alignment
 import androidx.compose.material3.Button
@@ -25,6 +22,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -36,7 +37,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.knighttech.homelibrary.domain.model.Book
 import com.knighttech.homelibrary.domain.usecases.ManageBookDatabase
-import com.knighttech.homelibrary.ui.theme.White
 
 
 var allBooks: List<Book> = listOf()
@@ -45,19 +45,37 @@ class BookListActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         allBooks = ManageBookDatabase().getAllBooks(getApplicationContext())
         setContent {
+            var query_selector by remember { mutableStateOf("") }
+            var selectedFilter by remember { mutableStateOf("") }
+
             HomeLibraryTheme {
-                BookListScreen()
+                BookListScreen(
+                    query_selector = query_selector,
+                    onQueryChange = { query_selector = it },
+                    selectedFilter = selectedFilter,
+                    onFilterChange = { filter ->
+                        selectedFilter = filter
+                    }
+                )
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BookListScreen() {
+fun BookListScreen(
+    query_selector: String,
+    onQueryChange: (String) -> Unit,
+    selectedFilter: String,
+    onFilterChange: (String) -> Unit
+) {
     var query by remember { mutableStateOf("") }
-
+    var query_selector by remember { mutableStateOf("") }
+    var selectedFilter by remember { mutableStateOf("ISBN") }
     // Estado observable de la lista de libros
     val context = LocalContext.current
     val books = remember {
@@ -65,6 +83,9 @@ fun BookListScreen() {
             addAll(ManageBookDatabase().getAllBooks(context))
        }
     }
+
+    val filters = listOf("ISBN", "Autor", "Título")
+    var expanded by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         // Imagen de fondo
@@ -83,13 +104,66 @@ fun BookListScreen() {
             Spacer(modifier = Modifier.height(50.dp))
 
             // Input búsqueda
-            TextField(
+            /*TextField(
                 value = query,
                 onValueChange = { query = it },
                 label = { Text("Buscar libro por ISBN") },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(10.dp)
-            )
+            )*/
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // TextField para el texto de búsqueda
+                TextField(
+                    value = query,
+                    onValueChange = onQueryChange,
+                    label = { Text("Filtrar") },
+                    modifier = Modifier
+                        .weight(1f) // ocupa todo el espacio disponible
+                        .height(60.dp),
+                    shape = RoundedCornerShape(topStart = 10.dp, bottomStart = 10.dp) // esquinas redondeadas solo izquierda
+                )
+
+                // Dropdown para seleccionar filtro
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = !expanded },
+                    modifier = Modifier
+                        .width(150.dp) // muy pequeño
+                        .height(60.dp)
+                ) {
+                    TextField(
+                        value = selectedFilter,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Filtro") },
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                        },
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxSize(),
+                        shape = RoundedCornerShape(topEnd = 10.dp, bottomEnd = 10.dp) // esquinas solo derecha
+                    )
+
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        filters.forEach { filter ->
+                            DropdownMenuItem(
+                                text = { Text(filter) },
+                                onClick = {
+                                    onFilterChange(filter)
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 

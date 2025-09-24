@@ -1,6 +1,8 @@
 package com.knighttech.homelibrary
 
+import android.app.DatePickerDialog
 import android.content.Intent
+import android.graphics.drawable.Icon
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -18,9 +20,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextField
 import androidx.compose.material3.Text
@@ -32,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -43,6 +50,7 @@ import com.knighttech.homelibrary.domain.usecases.ManageBookDatabase
 import com.knighttech.homelibrary.ui.theme.Purple40
 import com.knighttech.homelibrary.ui.theme.HomeLibraryTheme
 import com.knighttech.homelibrary.ui.theme.White
+import java.util.Calendar
 
 var save = 0
 
@@ -164,12 +172,33 @@ fun ManualBookForm(
                 shape = RoundedCornerShape(10.dp)
             )
 
+
+            val context = LocalContext.current
+            val calendar = Calendar.getInstance()
+            var date by remember { mutableStateOf("") }
+            // DatePickerDialog nativo de Android
+            val datePickerDialog = DatePickerDialog(
+                context,
+                { _, year, month, dayOfMonth ->
+                    date = "%02d/%02d/%04d".format(dayOfMonth, month + 1, year)
+                    //onDateSelected(date)
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+            )
             TextField(
-                value = publishedDate,
-                onValueChange = { publishedDate = it },
+                value = date,
+                onValueChange = { date = it },
                 label = { Text("Fecha de publicación") },
                 modifier = Modifier.fillMaxWidth().padding(vertical=10.dp),
-                shape = RoundedCornerShape(10.dp)
+                shape = RoundedCornerShape(10.dp),
+                readOnly = true,
+                trailingIcon = {
+                    IconButton(onClick = { datePickerDialog.show() }) {
+                        Icon(Icons.Default.DateRange, contentDescription = "Seleccionar fecha")
+                    }
+                }
             )
 
             TextField(
@@ -182,42 +211,56 @@ fun ManualBookForm(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Row(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 10.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Button(
                     shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.weight(0.9f),
+                    modifier = Modifier.fillMaxWidth().height(60.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Purple40),
+                    onClick = {
+                        if (isbn.isNotBlank() && title.isNotBlank()) {
+                            onSave(
+                                Book(
+                                    isbn_13 = isbn,
+                                    title = title,
+                                    author1 = author,
+                                    author2 = "NOAUTOR",
+                                    publisher = publisher,
+                                    published_date = publishedDate,
+                                    thumbnail = thumbnail
+                                )
+                            )
+                        }
+                    }) {
+                    Text("Guardar", color = White)
+                }
+                Spacer(Modifier.height(10.dp))
+                Button(
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.fillMaxWidth().height(60.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Purple40),
                     onClick = onCancel) {
                     Text("Cancelar", color = White)
-                }
-                Button(
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.weight(0.9f),
-                    colors = ButtonDefaults.buttonColors(containerColor = Purple40),
-                    onClick = {
-                    if (isbn.isNotBlank() && title.isNotBlank()) {
-                        onSave(
-                            Book(
-                                isbn_13 = isbn,
-                                title = title,
-                                author1 = author,
-                                author2 = "NOAUTOR",
-                                publisher = publisher,
-                                published_date = publishedDate,
-                                thumbnail = thumbnail
-                            )
-                        )
-                    }
-                }) {
-                    Text("Guardar", color = White)
                 }
             }
         }
     }
 }
 
+
+@Composable
+@Preview
+fun PrevAct() {
+    ManualBookForm(
+        onSave = {
+
+        },
+        onCancel = {
+
+        }
+    )
+}
