@@ -1,9 +1,9 @@
 package com.knighttech.homelibrary
 
-import android.app.Activity.RESULT_OK
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -13,26 +13,24 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.knighttech.homelibrary.ui.theme.HomeLibraryTheme
 
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.lifecycleScope
 import com.knighttech.homelibrary.domain.model.Book
-import com.knighttech.homelibrary.domain.usecases.GetBookByIsbnUsecase
-import com.knighttech.homelibrary.ui.theme.AddBookFormActivity
+import com.knighttech.homelibrary.domain.usecases.GetBookFromApi
+import com.knighttech.homelibrary.domain.usecases.ManageBookDatabase
 import com.knighttech.homelibrary.ui.theme.White
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -42,6 +40,7 @@ class AddBookActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        var globalIsbn: String = "NOISBN"
         setContent {
             var query by remember { mutableStateOf("") }
 
@@ -57,21 +56,27 @@ class AddBookActivity : ComponentActivity() {
                 }
             }
             var showPreview by remember { mutableStateOf(false) }
+            var showDialog by remember { mutableStateOf(true) }
             var theBook by remember { mutableStateOf<Book?>(null) }
+            var isError by remember { mutableStateOf(false) }
 
             SearchScreen(
                 query = query,
                 onQueryChange = { query = it },
                 onSearchClick = { isbn ->
-                    GlobalScope.launch(Dispatchers.IO) {
-                        println("Buscar: $isbn")
-                        val ser = GetBookByIsbnUsecase()
-                        ser.getBookByIsbn(isbn) { book ->
-                            theBook = book
-                            showPreview = true
+                    if (!isbn.isBlank()) {
+                        GlobalScope.launch(Dispatchers.IO) {
+                            println("Buscar: $isbn")
+                            val api = GetBookFromApi()
+                            api.getBookByIsbn(isbn) { book ->
+                                theBook = book
+                                showPreview = true
+                            }
+                            showDialog = true
+                            globalIsbn = isbn
                         }
-
-
+                    } else{
+                        isError = true
                     }
                 },
                 onScanClick = {
@@ -85,22 +90,32 @@ class AddBookActivity : ComponentActivity() {
                         book = theBook!!,
                         onDismiss = { showPreview = false },
                         onConfirm = {
-                            // Aquí guardas en Room
+                            ManageBookDatabase().saveBook(theBook!!, getApplicationContext())
+                            Toast.makeText(applicationContext, "Se ha ha añadido el libro a la biblioteca", Toast.LENGTH_LONG).show()
                             showPreview = false
+                            startActivity(Intent(this, MainActivity::class.java))
+                            //this.onDestroy()
                         }
                     )
                 } else {
-                    AlertaLibroNoEncontrado(
-                        onConfirm = {
-                            launcher.launch(Intent(this, AddBookFormActivity::class.java))
-                        },
-                        onDismiss = {
-                            this.onDestroy()
-                        },
-                        theBook?.isbn_13 ?: "NOISBN"
+                    if(showDialog) {
+                        AlertaLibroNoEncontrado(
+                            onConfirm = {
+                                launcher.launch(Intent(this, AddBookFormActivity::class.java))
+                            },
+                            onDismiss = {
+                                showDialog = false
+                            },
+                            globalIsbn
 
-                    )
+                        )
+                    }
                 }
+            }
+
+            if(isError){
+                Toast.makeText(applicationContext, "El ISBN no puede estar vacío", Toast.LENGTH_LONG).show()
+                isError = false
             }
         }
     }
@@ -113,6 +128,7 @@ fun SearchScreen(
     onSearchClick: (String) -> Unit,
     onScanClick: () -> Unit
 ) {
+    var isError by remember { mutableStateOf(false) }
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(id = R.drawable.fondo_imagen),
@@ -130,7 +146,7 @@ fun SearchScreen(
 
             TextField(
                 value = query,
-                onValueChange = { onQueryChange(it) },
+                onValueChange = {onQueryChange(it)},
                 label = { Text("Buscar libro") },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -200,7 +216,7 @@ fun BookPreviewDialog(
 @Composable
 fun AlertaLibroNoEncontrado(onConfirm: () -> Unit, onDismiss: () -> Unit, isbn: String) {
     AlertDialog(
-        onDismissRequest = { onDismiss() },
+        onDismissRequest = { onConfirm },
         confirmButton = {
             TextButton(onClick = onConfirm) { Text("Sí") }
         },
@@ -210,7 +226,7 @@ fun AlertaLibroNoEncontrado(onConfirm: () -> Unit, onDismiss: () -> Unit, isbn: 
         title = { Text("Error al buscar libro") },
         text = {
             Column {
-                Text("El libro con ISBN no ha sido encontrado. ¿Desea introducir los datos manualmente?")
+                Text("El libro con el ISBN $isbn no ha sido encontrado. ¿Desea introducir los datos manualmente?")
             }
         }
     )

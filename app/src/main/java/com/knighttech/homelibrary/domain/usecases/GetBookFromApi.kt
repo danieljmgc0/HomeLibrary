@@ -1,16 +1,15 @@
 package com.knighttech.homelibrary.domain.usecases
 
-import android.util.Log
+import androidx.room.Database
 import com.google.gson.Gson
-import com.google.gson.JsonObject
 import com.knighttech.homelibrary.BuildConfig
+//import com.knighttech.homelibrary.data.db.BookDatabase
 import com.knighttech.homelibrary.domain.model.Book
 import com.knighttech.homelibrary.domain.model.BookSearchResponse
 import okhttp3.Call
 import okhttp3.OkHttpClient
 import okhttp3.Callback
 import okhttp3.HttpUrl
-import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.Request
 import okhttp3.Response
 import java.io.IOException
@@ -20,7 +19,7 @@ private const val BASE_URL = "https://www.googleapis.com/books/v1/volumnes"
 private val client = OkHttpClient()
 
 
-class GetBookByIsbnUsecase {
+class GetBookFromApi {
     suspend fun getBookByIsbn(isbn: String, onResult: (Book?) -> Unit) {
 
         val url = HttpUrl.Builder()

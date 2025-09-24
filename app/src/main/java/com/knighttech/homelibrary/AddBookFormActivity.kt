@@ -1,11 +1,12 @@
-package com.knighttech.homelibrary.ui.theme
+package com.knighttech.homelibrary
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,13 +16,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.input.TextFieldLineLimits
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,26 +34,55 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.knighttech.homelibrary.R
+import androidx.compose.ui.window.Dialog
 import com.knighttech.homelibrary.domain.model.Book
-import com.knighttech.homelibrary.ui.theme.ui.theme.HomeLibraryTheme
+import com.knighttech.homelibrary.domain.usecases.ManageBookDatabase
+import com.knighttech.homelibrary.ui.theme.Purple40
+import com.knighttech.homelibrary.ui.theme.HomeLibraryTheme
+import com.knighttech.homelibrary.ui.theme.White
+
+var save = 0
 
 class AddBookFormActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        var theBook: Book = Book("", "" ,"" ,"None", "", "", "None" )
         setContent {
             HomeLibraryTheme {
                 ManualBookForm(
                     onSave = { book ->
                         // Aquí guardas en Room
-                        println("Libro manual: $book")
-
+                        //println("Libro manual: $book")
+                        save = 1
+                        theBook = book
+                        ManageBookDatabase().saveBook(theBook!!, getApplicationContext())
+                        Toast.makeText(applicationContext, "Se ha ha añadido el libro a la biblioteca", Toast.LENGTH_LONG).show()
+                        startActivity(Intent(this, MainActivity::class.java))
+                        this.onDestroy()
                     },
                     onCancel = {
-                        println("Cancelar")
+                        save = 2
+                        startActivity(Intent(this, MainActivity::class.java))
+                        this.onDestroy()
+                    }
+                )
+            }
+            if (save == 1) {
+                BookPreviewDialog(
+                    theBook,
+                    onDismiss = {
+                        startActivity(Intent(this, MainActivity::class.java))
+                        this.onDestroy()
+                    },
+                    onConfirm = {
+                        ManageBookDatabase().saveBook(theBook, getApplicationContext())
+
+                        startActivity(Intent(this, MainActivity::class.java))
+                        this.onDestroy()
                     }
                 )
             }
@@ -142,20 +172,30 @@ fun ManualBookForm(
                 value = thumbnail,
                 onValueChange = { thumbnail = it },
                 label = { Text("URL Thumbnail") },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(vertical=10.dp),
                 shape = RoundedCornerShape(10.dp)
             )
 
             Spacer(modifier = Modifier.height(24.dp))
 
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 10.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Button(onClick = onCancel) {
-                    Text("Cancelar")
+                Button(
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.weight(0.9f),
+                    colors = ButtonDefaults.buttonColors(containerColor = Purple40),
+                    onClick = onCancel) {
+                    Text("Cancelar", color = White)
                 }
-                Button(onClick = {
+                Button(
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.weight(0.9f),
+                    colors = ButtonDefaults.buttonColors(containerColor = Purple40),
+                    onClick = {
                     if (isbn.isNotBlank() && title.isNotBlank()) {
                         onSave(
                             Book(
@@ -170,15 +210,10 @@ fun ManualBookForm(
                         )
                     }
                 }) {
-                    Text("Guardar")
+                    Text("Guardar", color = White)
                 }
             }
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-
-}

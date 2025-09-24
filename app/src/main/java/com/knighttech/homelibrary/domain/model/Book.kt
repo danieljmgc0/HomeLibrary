@@ -3,8 +3,9 @@ package com.knighttech.homelibrary.domain.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.serialization.Serializable
 
-@Entity
+/*@Entity(tableName = "books")
 data class Book(
     @PrimaryKey var isbn_13: String,
     @ColumnInfo(name = "title") var title: String,
@@ -14,22 +15,17 @@ data class Book(
     @ColumnInfo(name = "published_date") var published_date: String,
     @ColumnInfo("thumbnail") var thumbnail: String
 )
+*/
 
 
-
-// Puedes crear datos de ejemplo
-object SampleData {
-    val books = listOf(
-        Book("9780140449136", "Odisea", "Homero", "NOAUTOR", "MIEDIT", "HOY", "SINIMAGEN"),
-        Book("9788420413380", "Don Quijote de la Mancha", "Miguel de Cervantes", "NOAUTOR", "MIEDIT", "HOY", "SINIMAGEN"),
-        Book("9788467037635", "Cien años de soledad", "Gabriel García Márquez", "NOAUTOR", "MIEDIT", "HOY", "SINIMAGEN"),
-        Book("9788467037635", "Cien años de soledad", "Gabriel García Márquez", "NOAUTOR", "MIEDIT", "HOY", "SINIMAGEN"),
-        Book("9788467037635", "Cien años de soledad", "Gabriel García Márquez", "NOAUTOR", "MIEDIT", "HOY", "SINIMAGEN"),
-        Book("9788467037635", "Cien años de soledad", "Gabriel García Márquez", "NOAUTOR", "MIEDIT", "HOY", "SINIMAGEN"),
-        Book("9788467037635", "Cien años de soledad", "Gabriel García Márquez", "NOAUTOR", "MIEDIT", "HOY", "SINIMAGEN"),
-        Book("9788467037635", "Cien años de soledad", "Gabriel García Márquez", "NOAUTOR", "MIEDIT", "HOY", "SINIMAGEN"),
-        Book("9788467037635", "Cien años de soledad", "Gabriel García Márquez", "NOAUTOR", "MIEDIT", "HOY", "SINIMAGEN"),
-        Book("9788467037635", "Cien años de soledad", "Gabriel García Márquez", "NOAUTOR", "MIEDIT", "HOY", "SINIMAGEN")
-
-    )
-}
+@Serializable
+data class Book(
+    var isbn_13: String,
+    var title: String,
+    //var authors : List<String>,
+    var author1: String,
+    var author2: String,
+    var publisher: String,
+    var published_date: String,
+    var thumbnail: String
+)
