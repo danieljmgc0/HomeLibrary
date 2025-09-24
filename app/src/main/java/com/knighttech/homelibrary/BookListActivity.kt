@@ -1,6 +1,7 @@
 package com.knighttech.homelibrary
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -118,21 +119,25 @@ fun BookListScreen() {
                                 Text("Autor: ${book.author1}")
                             }
 
-                            // Botón eliminar
-                            Button(
-                                onClick = {
-                                    // Eliminar de la base de datos
-                                    ManageBookDatabase().deleteBook(book.isbn_13, context)
+                        }
+                        // Botón eliminar
+                        Button(
+                            onClick = {
+                                // Eliminar de la base de datos
+                                ManageBookDatabase().deleteBook(context, book.isbn_13)
 
-                                    // Eliminar de la lista en memoria para refrescar la UI
-                                    books.remove(book)
-                                },
-                                shape = RoundedCornerShape(8.dp),
-                                modifier = Modifier
-                                    .padding(start = 8.dp)
-                            ) {
-                                Text("Eliminar")
-                            }
+                                // Eliminar de la lista en memoria para refrescar la UI
+                                books.remove(book)
+
+                                Toast.makeText(context, "Se ha eliminado el libro", Toast.LENGTH_LONG).show()
+                            },
+                            shape = RoundedCornerShape(8.dp),
+                            modifier = Modifier
+                                .padding(start = 8.dp, end = 8.dp, bottom = 4.dp)
+                                .fillMaxHeight()
+                                .fillMaxWidth()
+                        ) {
+                            Text("Eliminar")
                         }
                     }
                 }

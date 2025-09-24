@@ -59,10 +59,14 @@ class AddBookFormActivity : ComponentActivity() {
                         //println("Libro manual: $book")
                         save = 1
                         theBook = book
-                        ManageBookDatabase().saveBook(theBook!!, getApplicationContext())
-                        Toast.makeText(applicationContext, "Se ha ha añadido el libro a la biblioteca", Toast.LENGTH_LONG).show()
-                        startActivity(Intent(this, MainActivity::class.java))
-                        this.onDestroy()
+                        try{
+                            ManageBookDatabase().saveBook( getApplicationContext(), theBook!!)
+                            Toast.makeText(applicationContext, "Se ha ha añadido el libro a la biblioteca", Toast.LENGTH_LONG).show()
+                            startActivity(Intent(this, MainActivity::class.java))
+                            this.onDestroy()
+                        } catch (e: IllegalStateException) {
+                            Toast.makeText(applicationContext, e.message, Toast.LENGTH_LONG).show()
+                        }
                     },
                     onCancel = {
                         save = 2
@@ -79,7 +83,7 @@ class AddBookFormActivity : ComponentActivity() {
                         this.onDestroy()
                     },
                     onConfirm = {
-                        ManageBookDatabase().saveBook(theBook, getApplicationContext())
+                        ManageBookDatabase().saveBook( getApplicationContext(), theBook)
 
                         startActivity(Intent(this, MainActivity::class.java))
                         this.onDestroy()

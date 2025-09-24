@@ -14,24 +14,32 @@ import kotlinx.coroutines.launch
 
 class ManageBookDatabase {
 
-    fun saveBook(book: Book, context: Context) {
-        Log.d("BOOOK ES ", book.toString())
-        val storage: IBookStorage = BookStorage_JsonImpl()
-        storage.saveBook(context, book)
+    fun saveBook(context: Context, book: Book) {
+        try{
+            val storage: IBookStorage = BookStorage_JsonImpl()
+            storage.saveBook(context, book)
+        } catch (e: IllegalStateException){
+            throw e
+        }
     }
 
-    fun deleteBook(isbn: String, context: Context) {
+    fun deleteBook(context: Context, isbn: String) {
         val storage: IBookStorage = BookStorage_JsonImpl()
         storage.deleteBook(context, isbn)
     }
 
-    fun getBookByIsbn(isbn: String, context: Context): Book? {
-        val storage: IBookStorage = BookStorage_JsonImpl()
-        return storage.getBookByIsbn(context, isbn)
+    fun getBookByIsbn(context: Context, isbn: String): Book? {
+        try{
+            val storage: IBookStorage = BookStorage_JsonImpl()
+            return storage.getBookByIsbn(context, isbn)
+        } catch (e: NoSuchElementException){
+            return null
+        }
     }
 
     fun getAllBooks(context: Context): List<Book> {
         val storage: IBookStorage = BookStorage_JsonImpl()
+
         var books = storage.getAllBooks(context)
         Log.d("BOOOKS ES", books.toString())
         return books

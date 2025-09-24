@@ -22,28 +22,47 @@ class BookStorage_JsonImpl: IBookStorage {
     }
 
     override fun getBookByIsbn(context: Context, isbn: String): Book {
-        val file = File(context.filesDir, "books.json")
-        return getAllBooks(context).first {it.isbn_13 == isbn }
+        /*val file = File(context.filesDir, "books.json")
+        val allBooks: MutableList<Book> = if (file.exists() && file.length() > 0) {
+            val json = file.readText()
+            Json.decodeFromString<List<Book>>(json).toMutableList()
+            } else {
+                mutableListOf()
+            }
+        */
+        var allBooks = getAllBooks(context)
+        var book: Book? = null
+        try{
+            book = allBooks.first {it.isbn_13 == isbn }
+            return book
+        } catch (e: NoSuchElementException){
+            throw e
+        }
     }
 
     override fun deleteBook(context: Context, isbn: String) {
         val file = File(context.filesDir, "books.json")
-        if(!file.exists()) file.createNewFile()
-        val books = getAllBooks(context).toMutableList()
-        books.removeIf { it.isbn_13 == isbn }
-        file.writeText(Json.encodeToString(books))
+        if(file.exists()){
+            val books = getAllBooks(context).toMutableList()
+            books.removeIf { it.isbn_13 == isbn }
+            file.writeText(Json.encodeToString(books))
+        }
     }
 
     override fun saveBook(context: Context, book: Book) {
         val file = File(context.filesDir, "books.json")
-        val books: MutableList<Book> = if (file.exists() && file.length() > 0) {
-            val json = file.readText()
-            Json.decodeFromString<List<Book>>(json).toMutableList()
-        } else {
-            mutableListOf()
+        try{
+            var book = getBookByIsbn(context, book.isbn_13)
+            throw IllegalStateException("El libro ya existe en la base de datos")
+        } catch (e: NoSuchElementException){
+            val books: MutableList<Book> = if (file.exists() && file.length() > 0) {
+                val json = file.readText()
+                Json.decodeFromString<List<Book>>(json).toMutableList()
+            } else {
+                mutableListOf()
+            }
+            books.add(book)
+            file.writeText(Json.encodeToString(books))
         }
-
-        books.add(book)
-        file.writeText(Json.encodeToString(books))
     }
 }

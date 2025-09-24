@@ -90,10 +90,17 @@ class AddBookActivity : ComponentActivity() {
                         book = theBook!!,
                         onDismiss = { showPreview = false },
                         onConfirm = {
-                            ManageBookDatabase().saveBook(theBook!!, getApplicationContext())
-                            Toast.makeText(applicationContext, "Se ha ha añadido el libro a la biblioteca", Toast.LENGTH_LONG).show()
-                            showPreview = false
-                            startActivity(Intent(this, MainActivity::class.java))
+                            try{
+                                ManageBookDatabase().saveBook( getApplicationContext(), theBook!!)
+                                Toast.makeText(applicationContext, "Se ha ha añadido el libro a la biblioteca", Toast.LENGTH_LONG).show()
+                                startActivity(Intent(this, MainActivity::class.java))
+                            } catch (e: IllegalStateException) {
+                                Toast.makeText(applicationContext, e.message, Toast.LENGTH_LONG).show()
+                            } finally {
+                                showPreview = false
+                            }
+
+
                             //this.onDestroy()
                         }
                     )
