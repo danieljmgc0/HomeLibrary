@@ -40,10 +40,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.knighttech.homelibrary.domain.model.Book
 import com.knighttech.homelibrary.domain.usecases.ManageBookDatabase
@@ -132,9 +135,13 @@ fun ManualBookForm(
             Spacer(modifier = Modifier.height(50.dp))
 
             Text(
-                "Introduce los datos del libro",
-                style = MaterialTheme.typography.titleLarge,
+                text = "LIBRO",
+                fontFamily = FontFamily(Font(R.font.handwritten)),
+                fontSize = 42.sp,
                 fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .padding(top = 5.dp, start = 13.dp)
+                    .align(Alignment.Start),
                 color = Purple40
             )
 

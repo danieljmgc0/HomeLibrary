@@ -41,7 +41,6 @@ class ManageBookDatabase {
         val storage: IBookStorage = BookStorage_JsonImpl()
 
         var books = storage.getAllBooks(context)
-        Log.d("BOOOKS ES", books.toString())
         return books
     }
 

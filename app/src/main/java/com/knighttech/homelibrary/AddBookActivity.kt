@@ -160,11 +160,11 @@ fun SearchScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             //verticalArrangement = Arrangement.Center
         ) {
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(25.dp))
             Text(
-                text = "Home",
+                text = "Nuevo",
                 fontFamily = FontFamily(Font(R.font.handwritten)),
-                fontSize = 44.sp,
+                fontSize = 40.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
                     .padding(top = 5.dp, start = 10.dp)
@@ -173,9 +173,9 @@ fun SearchScreen(
             )
 
             Text(
-                text = "Library",
+                text = "Libro",
                 fontFamily = FontFamily(Font(R.font.handwritten)),
-                fontSize = 44.sp,
+                fontSize = 40.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 10.dp).align(Alignment.Start),
                 color = Purple40

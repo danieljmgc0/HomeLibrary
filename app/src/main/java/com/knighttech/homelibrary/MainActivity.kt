@@ -2,6 +2,8 @@ package com.knighttech.homelibrary
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -23,8 +26,11 @@ import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
@@ -38,19 +44,14 @@ import com.knighttech.homelibrary.ui.theme.Purple40
 
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         setContent {
             MenuScreen(
-                onAddBookClick = {
-                    // Aquí lanzas tu actividad para añadir libro
-                    startActivity(Intent(this, AddBookActivity::class.java))
-                },
-                onViewListClick = {
-                    // Aquí lanzas tu actividad para ver lista
-                    startActivity(Intent(this, BookListActivity::class.java))
-                }
+                onAddBookClick = { startActivity(Intent(this, AddBookActivity::class.java)) },
+                onViewListClick = { startActivity(Intent(this, BookListActivity::class.java)) }
             )
         }
     }
@@ -79,11 +80,11 @@ fun MenuScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             //verticalArrangement = Arrangement.Center
         ) {
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(25.dp))
             Text(
                 text = "Home",
                 fontFamily = FontFamily(Font(R.font.handwritten)),
-                fontSize = 44.sp,
+                fontSize = 40.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
                     .padding(top = 5.dp, start = 10.dp)
@@ -94,7 +95,7 @@ fun MenuScreen(
             Text(
                 text = "Library",
                 fontFamily = FontFamily(Font(R.font.handwritten)),
-                fontSize = 44.sp,
+                fontSize = 40.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 10.dp).align(Alignment.Start),
                 color = Purple40

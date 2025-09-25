@@ -15,4 +15,14 @@
         <item name="postSplashScreenTheme">@style/Theme.HomeLibrary</item>
     </style>
 
+    <style name="Theme.MyApp.SplashV2" parent="Theme.SplashScreen">
+        <!-- Fondo -->
+        <item name="windowSplashScreenBackground">@color/white</item>
+
+        <!-- Quitamos el círculo del icono -->
+        <item name="windowSplashScreenAnimatedIcon">@null</item>
+
+        <!-- Usamos un drawable como fondo con el logo -->
+        <item name="postSplashScreenTheme">@style/Theme.HomeLibrary</item>
+    </style>
 </resources>

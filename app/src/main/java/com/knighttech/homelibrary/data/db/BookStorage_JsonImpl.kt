@@ -17,7 +17,6 @@ class BookStorage_JsonImpl: IBookStorage {
         //return Json.decodeFromString<List<Book>>(jsonString)
 
         val jsonString = file.readText()
-        Log.d("JSON", jsonString)
         return Json.decodeFromString(jsonString)
     }
 
