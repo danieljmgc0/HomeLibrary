@@ -3,9 +3,6 @@
 ## Supported Versions
 Este proyecto se encuentra en desarrollo y actualmente soporta únicamente la última versión publicada en el repositorio.
 
-| Versión | Soportada |
-|---------|-----------|
-| latest  | ✅        |
 
 ## Recopilación y uso de datos
 Este proyecto **no recopila, procesa ni almacena datos personales del usuario**.  
